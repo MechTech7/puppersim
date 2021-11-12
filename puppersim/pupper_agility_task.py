@@ -19,10 +19,10 @@ class SimpleAgilityTask(task_interface.Task):
                 sensor_name="desired_direction", 
                 alpha=0.5, 
                 dev_norm=0.01, 
-                k_steps=20):
+                k_steps=2000):
 
         self._step_count = 0
-        self._terminal_condition = terminal_condition
+        self._terminal_conditions = terminal_condition
         self._env = None
 
         self.sensor_name = sensor_name
@@ -36,6 +36,7 @@ class SimpleAgilityTask(task_interface.Task):
         self.k_steps = k_steps
 
 
+        self._min_com_height = min_com_height
         self._divide_with_dt = True
 
         self._last_base_position = None
@@ -48,8 +49,12 @@ class SimpleAgilityTask(task_interface.Task):
 
     def reset(self, env):
         self._env = env
-        self._last_base_position = env_utils.get_robot_base_position(
-            self._env.robot)
+        self._last_base_position = np.array(env_utils.get_robot_base_position(
+            self._env.robot))
+
+        self.des_velocity = np.zeros(2, dtype=np.float32)
+        self.normed_des = np.zeros(2, dtype=np.float32)
+        self.des_speed = 0.0
 
     @property
     def set_count(self):
@@ -58,8 +63,8 @@ class SimpleAgilityTask(task_interface.Task):
     def update(self, env):
         """Updates the internal state of the task."""
         del env
-        self._last_base_position = env_utils.get_robot_base_position(
-            self._env.robot)
+        self._last_base_position = np.array(env_utils.get_robot_base_position(
+            self._env.robot))
 
     def velocity_update(self):
         #Every k timesteps, perturb the desired velocity vector in 
@@ -86,6 +91,7 @@ class SimpleAgilityTask(task_interface.Task):
 
         current_base_position = np.array(env_utils.get_robot_base_position(self._env.robot))
         velocity = current_base_position - self._last_base_position
+        velocity = velocity[:2]
 
         if self._divide_with_dt:
             velocity /= env.env_time_step
@@ -93,7 +99,7 @@ class SimpleAgilityTask(task_interface.Task):
         vel_speed = np.linalg.norm(velocity)
         normed_velocity = velocity / vel_speed
 
-        direction_rew = np.dot(normed_velocity, self.norm_des)
+        direction_rew = np.dot(normed_velocity, self.normed_des)
         speed_rew = 1 / (vel_speed - self.des_speed + self._epsilon)
 
 
@@ -102,6 +108,13 @@ class SimpleAgilityTask(task_interface.Task):
         
         reward = self._alpha * direction_rew + (1 - self._alpha) * speed_rew
 
+        """
+        print("-----------------")
+        print(f"des_vel: {self.des_velocity}")
+        print(f"reward: {reward}")
+        print("-----------------")
+        """
+        
         return reward
     
     def done(self, env):
