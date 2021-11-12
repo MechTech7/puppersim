@@ -26,8 +26,8 @@ def create_pupper_env(render):
 class PupperGymEnv(gym.Env):
   metadata = {'render.modes': ['human', 'rgb_array'], 'video.frames_per_second': 50}
 
-  def __init__(self):
-    self.env = create_pupper_env()
+  def __init__(self, render=False):
+    self.env = create_pupper_env(render)
     self.observation_space = self.env.observation_space
     self.action_space = self.env.action_space
 
