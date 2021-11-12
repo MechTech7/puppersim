@@ -9,7 +9,7 @@ import gin
 from pybullet_envs.minitaur.envs_v2 import env_loader
 import puppersim.data as pd
 
-def create_pupper_env():
+def create_pupper_env(render):
   CONFIG_DIR = puppersim.getPupperSimPath()+"/"
   _CONFIG_FILE = os.path.join(CONFIG_DIR, "pupper_pmtg.gin")
 #  _NUM_STEPS = 10000
@@ -17,7 +17,9 @@ def create_pupper_env():
 
   gin.bind_parameter("scene_base.SceneBase.data_root", pd.getDataPath()+"/")
   gin.parse_config_file(_CONFIG_FILE)
+  gin.bind_parameter("SimulationParameters.enable_rendering", render)
   env = env_loader.load()
+
   return env
 
 
