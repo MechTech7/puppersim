@@ -36,11 +36,7 @@ class SimpleAgilityTask(task_interface.Task):
 
         self._last_base_position = None
 
-<<<<<<< HEAD
         self._epsilon = 0.0001
-=======
-        self.epsilon = 0.0001
->>>>>>> 59cb9f7b6b0261ee874917e62b5b8c3345c5fa78
         
 
     def __call__(self, env):
