@@ -9,9 +9,9 @@ import gin
 from pybullet_envs.minitaur.envs_v2 import env_loader
 import puppersim.data as pd
 
-def create_pupper_env(render):
+def create_pupper_env(gin_config, render):
   CONFIG_DIR = puppersim.getPupperSimPath()+"/"
-  _CONFIG_FILE = os.path.join(CONFIG_DIR, "pupper_pmtg.gin")
+  _CONFIG_FILE = os.path.join(CONFIG_DIR, gin_config)
 #  _NUM_STEPS = 10000
 #  _ENV_RANDOM_SEED = 2
 
@@ -26,8 +26,9 @@ def create_pupper_env(render):
 class PupperGymEnv(gym.Env):
   metadata = {'render.modes': ['human', 'rgb_array'], 'video.frames_per_second': 50}
 
-  def __init__(self, render=False):
-    self.env = create_pupper_env(render)
+  def __init__(self, render=False, gin_config="pupper_pmtg.gin"):
+    self.gin_config = gin_config
+    self.env = create_pupper_env(gin_config, render)
     self.observation_space = self.env.observation_space
     self.action_space = self.env.action_space
 
