@@ -3,7 +3,6 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-from numpy.random.mtrand import rand
 
 import gin
 from pybullet_envs.minitaur.envs_v2.tasks import task_interface
@@ -37,7 +36,11 @@ class SimpleAgilityTask(task_interface.Task):
 
         self._last_base_position = None
 
+<<<<<<< HEAD
         self._epsilon = 0.0001
+=======
+        self.epsilon = 0.0001
+>>>>>>> 59cb9f7b6b0261ee874917e62b5b8c3345c5fa78
         
 
     def __call__(self, env):
