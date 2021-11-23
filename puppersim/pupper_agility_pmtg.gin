@@ -23,13 +23,16 @@ SIM_TIME_STEP = 0.001
 NUM_ACTION_REPEAT = 28
 
 
+#Task-specific Sensors
+pupper_agility_task.SimpleAgilityTask.agility_sensor = @agility_direction_sensor.DesiredDirectionSensor()
+
 # We use the default confirugration for MotorAngleSensor, which reads limits from the robot.
 imu_sensor.IMUSensor.channels = [%IMUChannel.ROLL]
 imu_sensor.IMUSensor.upper_bound = [3.1415]
 imu_sensor.IMUSensor.lower_bound = [-3.1415]
 
 #TODO: Add the desired velocity from the task as an input
-SENSORS = [@motor_angle_sensor.MotorAngleSensor(), @imu_sensor.IMUSensor()]
+SENSORS = [@motor_angle_sensor.MotorAngleSensor(), @imu_sensor.IMUSensor()] 
 
 locomotion_gym_config.SimulationParameters.sim_time_step_s = %SIM_TIME_STEP
 locomotion_gym_config.SimulationParameters.num_action_repeat = %NUM_ACTION_REPEAT

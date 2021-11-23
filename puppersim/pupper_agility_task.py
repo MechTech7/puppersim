@@ -16,7 +16,8 @@ class SimpleAgilityTask(task_interface.Task):
     def __init__(self, 
                 terminal_condition=terminal_conditions,
                 min_com_height=None,
-                sensor_name="desired_direction", 
+                sensor_name="desired_direction",
+                agility_sensor=None, 
                 alpha=0.5, 
                 dev_norm=0.01, 
                 k_steps=2000):
@@ -27,6 +28,9 @@ class SimpleAgilityTask(task_interface.Task):
 
         self.sensor_name = sensor_name
         #Objective Variables
+        self._agility_sensor = agility_sensor
+        
+
         self.des_velocity = np.array([0, 0], dtype=np.float32)
         self.des_speed = 0.0
         self.normed_des = np.array([0, 0], dtype=np.float32)
@@ -49,6 +53,10 @@ class SimpleAgilityTask(task_interface.Task):
 
     def reset(self, env):
         self._env = env
+
+        #self._agility_sensor.set_robot(self._env.robot)
+        self._agility_sensor.update()
+
         self._last_base_position = np.array(env_utils.get_robot_base_position(
             self._env.robot))
 
@@ -65,6 +73,11 @@ class SimpleAgilityTask(task_interface.Task):
         del env
         self._last_base_position = np.array(env_utils.get_robot_base_position(
             self._env.robot))
+        
+        self._agility_sensor.update()
+        #print("-----------------")
+        #print(f"task: {self._last_base_position}")
+        #print(f"sensor: {self._agility_sensor._last_base_position}")
 
     def velocity_update(self):
         #Every k timesteps, perturb the desired velocity vector in 
@@ -86,15 +99,19 @@ class SimpleAgilityTask(task_interface.Task):
         self._step_count += 1
         env = self._env
 
-        #TODO: Begin Testing Here
-        obs_dict = env._observation_dict[self.sensor_name]
+        des_vel = self._agility_sensor.get_des()
+        velocity = self._agility_sensor.get_vel()
 
-        current_base_position = np.array(env_utils.get_robot_base_position(self._env.robot))
-        velocity = current_base_position - self._last_base_position
-        velocity = velocity[:2]
+        des_speed = np.linalg.norm(des_vel)
+        normed_des = des_vel
 
+        if des_speed != 0:
+            normed_des /= des_speed
+
+        
         if self._divide_with_dt:
             velocity /= env.env_time_step
+        
 
         vel_speed = np.linalg.norm(velocity)
         normed_velocity = velocity / vel_speed
@@ -108,13 +125,14 @@ class SimpleAgilityTask(task_interface.Task):
         
         reward = self._alpha * direction_rew + (1 - self._alpha) * speed_rew
 
-        """
-        print("-----------------")
-        print(f"des_vel: {self.des_velocity}")
-        print(f"reward: {reward}")
-        print("-----------------")
-        """
         
+        """
+        print("-----------------")
+        print(f"des_vel: {des_vel}")
+        print(f"robot_vel: {velocity}")
+        print(f"reward: {reward}")
+        """
+    
         return reward
     
     def done(self, env):
@@ -125,4 +143,8 @@ class SimpleAgilityTask(task_interface.Task):
             return True
         
         return self._terminal_conditions(self._env)
+
+    @property
+    def sensors(self):
+        return [self._agility_sensor]
 
