@@ -39,7 +39,7 @@ class DesiredDirectionSensor(sensor.Sensor):
         )
 
     def _reset_des_vel(self):
-        self.des_velocity = np.zeros(2, dtype=np.float32)
+        self.des_velocity = np.array([1.0, 0.0], dtype=np.float32) #np.zeros(2, dtype=np.float32)
         self.normed_des = np.zeros(2, dtype=np.float32)
         self.des_speed = 0.0
 
@@ -49,7 +49,9 @@ class DesiredDirectionSensor(sensor.Sensor):
     def on_reset(self, env):
         self._env = env
         self._observation_buffer.reset()
-        
+
+        self.set_robot(self._env.robot)
+
         self._reset_des_vel()
         self._reset_vel_calc()
 
@@ -68,20 +70,27 @@ class DesiredDirectionSensor(sensor.Sensor):
         #print(f"-------\n{random_vec}")
 
         self.des_velocity = self.des_velocity + random_vec
+
+    def get_des(self):
+        return self.des_velocity
     
-    def get_robot_velocity(self):
-        
-        pass
+    def get_vel(self):
+        curr_vel = np.array(self._robot.base_position)[:2] - self._last_base_position
+        return curr_vel
+
+    def update(self):
+        self._last_base_position = np.array(self._robot.base_position)[:2]
 
     def _get_original_observation(self):
-        des_vel = np.copy(self.des_velocity)
-        current_vel = np.array(self._robot.base_position)[:2] - self._last_base_position
+        des_vel = self.get_des()
+        current_vel = self.get_vel()
 
         ret = np.concatenate((des_vel, current_vel), axis=0)
 
-        self._last_base_position = self._last_base_position
+        """
         if self._step_count % self._k_steps:
             self.velocity_update()
+        """
         
         self._step_count += 1
         return self._robot.timestamp, ret

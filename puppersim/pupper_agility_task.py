@@ -30,7 +30,6 @@ class SimpleAgilityTask(task_interface.Task):
         #Objective Variables
         self._agility_sensor = agility_sensor
         
-
         self.des_velocity = np.array([0, 0], dtype=np.float32)
         self.des_speed = 0.0
         self.normed_des = np.array([0, 0], dtype=np.float32)
@@ -54,7 +53,6 @@ class SimpleAgilityTask(task_interface.Task):
     def reset(self, env):
         self._env = env
 
-        #self._agility_sensor.set_robot(self._env.robot)
         self._agility_sensor.update()
 
         self._last_base_position = np.array(env_utils.get_robot_base_position(
@@ -120,8 +118,8 @@ class SimpleAgilityTask(task_interface.Task):
         speed_rew = 1 / (vel_speed - des_speed + self._epsilon)
         
         #TODO: Change the Reward
-        reward = self._alpha * direction_rew + (1 - self._alpha) * speed_rew
-
+        #reward = self._alpha * direction_rew + (1 - self._alpha) * speed_rew
+        reward = np.dot(des_vel, velocity)
         
         """
         print("-----------------")
