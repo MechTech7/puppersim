@@ -87,6 +87,8 @@ class SimpleForwardTask(task_interface.Task):
     self._step_count += 1
     env = self._env
     current_base_position = env_utils.get_robot_base_position(self._env.robot)
+    print (f"base_position: {current_base_position}")
+    
     velocity = -(current_base_position[1] - self._last_base_position[1])#negative Y axis
     if self._divide_with_dt:
       velocity /= env.env_time_step

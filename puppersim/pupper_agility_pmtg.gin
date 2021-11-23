@@ -6,6 +6,7 @@ import pybullet_envs.minitaur.envs_v2.scenes.scene_base
 import pybullet_envs.minitaur.envs_v2.scenes.simple_scene
 import pybullet_envs.minitaur.envs_v2.sensors.imu_sensor
 import pybullet_envs.minitaur.envs_v2.sensors.motor_angle_sensor
+import puppersim.agility_direction_sensor
 
 import pybullet_envs.minitaur.robots.hybrid_motor_model
 import puppersim.pupper_constants
@@ -27,9 +28,9 @@ NUM_ACTION_REPEAT = 28
 pupper_agility_task.SimpleAgilityTask.agility_sensor = @agility_direction_sensor.DesiredDirectionSensor()
 
 # We use the default confirugration for MotorAngleSensor, which reads limits from the robot.
-imu_sensor.IMUSensor.channels = [%IMUChannel.ROLL]
-imu_sensor.IMUSensor.upper_bound = [3.1415]
-imu_sensor.IMUSensor.lower_bound = [-3.1415]
+imu_sensor.IMUSensor.channels = [%IMUChannel.ROLL, %IMUChannel.PITCH, %IMUChannel.YAW, %IMUChannel.ROLL_RATE, %IMUChannel.PITCH_RATE, %IMUChannel.YAW_RATE]
+imu_sensor.IMUSensor.upper_bound = [3.1415, 3.1415, 3.1415, 3.1415, 3.1415, 3.1415]
+imu_sensor.IMUSensor.lower_bound = [-3.1415, -3.1415, -3.1415, -3.1415, -3.1415, -3.1415]
 
 #TODO: Add the desired velocity from the task as an input
 SENSORS = [@motor_angle_sensor.MotorAngleSensor(), @imu_sensor.IMUSensor()] 

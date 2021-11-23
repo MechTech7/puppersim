@@ -59,6 +59,7 @@ class SimpleAgilityTask(task_interface.Task):
 
         self._last_base_position = np.array(env_utils.get_robot_base_position(
             self._env.robot))
+        print(f"last_base_pos: {self._last_base_position}")
 
         self.des_velocity = np.zeros(2, dtype=np.float32)
         self.normed_des = np.zeros(2, dtype=np.float32)
@@ -92,10 +93,9 @@ class SimpleAgilityTask(task_interface.Task):
         self.des_velocity = self.des_velocity + random_vec
         self.des_speed = np.linalg.norm(self.des_velocity)
         self.normed_des = self.des_velocity / self.des_speed
-
+    
     def reward(self, env):
         del env
-
         self._step_count += 1
         env = self._env
 
@@ -116,13 +116,10 @@ class SimpleAgilityTask(task_interface.Task):
         vel_speed = np.linalg.norm(velocity)
         normed_velocity = velocity / vel_speed
 
-        direction_rew = np.dot(normed_velocity, self.normed_des)
-        speed_rew = 1 / (vel_speed - self.des_speed + self._epsilon)
-
-
-        if self._step_count % self.k_steps:
-            self.velocity_update()
+        direction_rew = np.dot(normed_velocity, normed_des)
+        speed_rew = 1 / (vel_speed - des_speed + self._epsilon)
         
+        #TODO: Change the Reward
         reward = self._alpha * direction_rew + (1 - self._alpha) * speed_rew
 
         
