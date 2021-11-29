@@ -115,7 +115,7 @@ class SimpleAgilityTask(task_interface.Task):
         normed_velocity = velocity / vel_speed
 
         direction_rew = np.dot(normed_velocity, normed_des)
-        speed_rew = 1 / (vel_speed - des_speed + self._epsilon)
+        speed_rew = abs(vel_speed - des_speed) / des_speed
         
         #TODO: Change the Reward
         #reward = self._alpha * direction_rew + (1 - self._alpha) * speed_rew
