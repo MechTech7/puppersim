@@ -34,6 +34,8 @@ class SimpleAgilityTask(task_interface.Task):
         self.des_speed = 0.0
         self.normed_des = np.array([0, 0], dtype=np.float32)
 
+
+
         self._alpha = alpha #relative importance of speed and direction
         self._deviation_norm = dev_norm
         self.k_steps = k_steps
